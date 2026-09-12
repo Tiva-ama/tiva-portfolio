@@ -43,15 +43,26 @@
   /* ตอนกดปุ่มเมนู หน้าจะไถลลงไปทีละนิด ระบบจึงไล่ไฮไลต์ทุกหัวข้อที่ผ่านระหว่างทาง
      กด Contacts ทีเดียวเมนูวิ่ง contact > home > about > work > portfolio > contact
      เห็นเป็นอาการกระพริบ จึงล็อกไว้ที่ปุ่มที่กด แล้วปลดเมื่อไถลถึงที่หมายจริง */
-  var lockTo = null, lockTimer = null;
+  var lockTo = null, lockGiveUp = null;
+
+  /* ปลดล็อกเมื่อ "ไถลถึงหัวข้อที่กด" เท่านั้น ไม่ปลดตามเวลาหรือตามการหยุดนิ่ง
+
+     เคยลองสองแบบแล้วพังทั้งคู่ ด้วยเหตุเดียวกัน:
+       - ตั้งเวลาตายตัว 1.5 วินาที -> หน้ายาวไถลไม่ทัน ปลดกลางทาง
+       - รอจนตำแหน่งหยุดนิ่ง       -> ตอนหน้ากำลังโหลดรูปกับตัวเล่นเพลง การไถลสะดุด
+                                       จนดูเหมือนหยุดแล้ว ก็ปลดกลางทางอีก
+     (วัดจริง: คลิกแรกหลังเปิดหน้า scroll ยิง 27 ครั้ง แต่คลิกเดิมซ้ำภายหลังยิง 86 ครั้ง)
+
+     การคงไฮไลต์ไว้นานเกินไปหน่อยไม่เสียหายอะไร เพราะมันชี้หัวข้อที่ผู้ใช้กำลังจะไปถึง
+     ส่วนการปลดเร็วไปเห็นเป็นอาการกระพริบทันที จึงเลือกด้านที่ปลอดภัยกว่า
+     ตัวจับเวลา 5 วินาทีมีไว้กันล็อกค้างถาวรเท่านั้น ปกติไม่มีวันได้ทำงาน */
   function lockSpy(id){
     lockTo = id;
     setActive(id);
-    clearTimeout(lockTimer);
-    // กันเหนียว เผื่อไถลไปไม่ถึงที่หมายด้วยเหตุใดก็ตาม จะได้ไม่ล็อกค้าง
-    lockTimer = setTimeout(function(){ lockTo = null; updateSpy(); }, 1500);
+    clearTimeout(lockGiveUp);
+    lockGiveUp = setTimeout(function(){ lockTo = null; updateSpy(); }, 5000);
   }
-  function unlockSpy(){ lockTo = null; clearTimeout(lockTimer); }
+  function unlockSpy(){ lockTo = null; clearTimeout(lockGiveUp); }
 
   function updateSpy(){
     if (!sections.length) return;
@@ -66,8 +77,8 @@
       current = sections[sections.length - 1];
     }
     if (lockTo){
-      if (current.id === lockTo) unlockSpy();   // ถึงที่หมายแล้ว คืนการทำงานปกติ
-      else { setActive(lockTo); return; }       // ยังไถลอยู่ คงปุ่มที่กดไว้
+      if (current.id === lockTo){ unlockSpy(); }   // ถึงหัวข้อที่กดแล้ว คืนการทำงานปกติ
+      else { setActive(lockTo); return; }          // ยังไถลอยู่ คงไฮไลต์ไว้ที่ปุ่มที่กด
     }
     setActive(current.id);
   }
