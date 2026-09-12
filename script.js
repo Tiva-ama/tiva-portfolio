@@ -40,6 +40,19 @@
      วิธีนี้ไม่สนใจว่า section สูงเท่าไร ผลจึงตรงกับที่ตาเห็นเสมอ */
   var navStage = document.querySelector('.nav-stage');
 
+  /* ตอนกดปุ่มเมนู หน้าจะไถลลงไปทีละนิด ระบบจึงไล่ไฮไลต์ทุกหัวข้อที่ผ่านระหว่างทาง
+     กด Contacts ทีเดียวเมนูวิ่ง contact > home > about > work > portfolio > contact
+     เห็นเป็นอาการกระพริบ จึงล็อกไว้ที่ปุ่มที่กด แล้วปลดเมื่อไถลถึงที่หมายจริง */
+  var lockTo = null, lockTimer = null;
+  function lockSpy(id){
+    lockTo = id;
+    setActive(id);
+    clearTimeout(lockTimer);
+    // กันเหนียว เผื่อไถลไปไม่ถึงที่หมายด้วยเหตุใดก็ตาม จะได้ไม่ล็อกค้าง
+    lockTimer = setTimeout(function(){ lockTo = null; updateSpy(); }, 1500);
+  }
+  function unlockSpy(){ lockTo = null; clearTimeout(lockTimer); }
+
   function updateSpy(){
     if (!sections.length) return;
     var line = (navStage ? navStage.getBoundingClientRect().height : 0) + 40;
@@ -52,6 +65,10 @@
     if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2){
       current = sections[sections.length - 1];
     }
+    if (lockTo){
+      if (current.id === lockTo) unlockSpy();   // ถึงที่หมายแล้ว คืนการทำงานปกติ
+      else { setActive(lockTo); return; }       // ยังไถลอยู่ คงปุ่มที่กดไว้
+    }
     setActive(current.id);
   }
 
@@ -63,7 +80,12 @@
   window.addEventListener('resize', updateSpy);
   updateSpy();
 
-  links.forEach(function(l){ l.addEventListener('click', function(){ setActive(l.getAttribute('data-sec')); }); });
+  links.forEach(function(l){
+    l.addEventListener('click', function(){ lockSpy(l.getAttribute('data-sec')); });
+  });
+  // ถ้าผู้ใช้ปัดหรือหมุนล้อเองระหว่างที่ยังไถลอยู่ ให้ถือว่าเปลี่ยนใจ ปลดล็อกทันที
+  window.addEventListener('wheel', unlockSpy, { passive: true });
+  window.addEventListener('touchstart', unlockSpy, { passive: true });
 
   /* -------- ชื่อใหญ่เลื่อนขึ้นจากใต้เส้น -------- */
   var heroTitle = document.getElementById('heroTitle');
