@@ -1,0 +1,549 @@
+:root{
+    /* ---- โทนขาวดำ ---- */
+    --paper:    #0C0C0E;   /* พื้นหลังหน้า */
+    --paper-2:  #131316;   /* พื้นยกระดับ */
+    --card:     #17171B;
+    --line:     #2B2B33;
+    --line-soft:#1F1F25;
+    --ink:      #F2F2F0;
+    --ink-soft: #A2A2AA;
+    --ink-faint:#6B6B75;
+
+    /* สองชื่อนี้เหลือจากพาเลตต์เดิม เก็บไว้เพราะ project.html ยังอ้างอยู่ */
+    --apple:   #A2A2AA;
+    --tote:    #2B2B33;
+
+    --radius-lg: 20px;
+    --radius-md: 14px;
+
+    /* IBM Plex Mono ไม่มีตัวอักษรไทย ต้องคั่น IBM Plex Sans Thai ไว้เป็นลำดับถัดไป
+       ไม่งั้นข้อความไทยจะตกไปใช้ฟอนต์ระบบ กลายเป็นคนละหน้าตากับส่วนอื่นของเว็บ
+       เบราว์เซอร์เลือกฟอนต์ทีละตัวอักษร อังกฤษจึงยังได้ Plex Mono ตามเดิม */
+    --mono: "IBM Plex Mono", "IBM Plex Sans Thai", ui-monospace, SFMono-Regular, Menlo, monospace;
+    --sans: "IBM Plex Sans Thai", "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+    --ease: cubic-bezier(.16,1,.3,1);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation-duration:.01ms !important; transition-duration:.01ms !important;} }
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:var(--sans);
+    font-size:15.5px; line-height:1.72; -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  h1,h2,h3{ margin:0; font-weight:600; letter-spacing:-.01em; }
+  a{ color:inherit; text-decoration:none; }
+  button{ font-family:inherit; }
+  svg{ display:block; }
+  .wrap{ max-width:1180px; margin:0 auto; padding:0 34px; }
+  @media (max-width:640px){ .wrap{ padding:0 20px; } }
+
+  /* ---------------- วงกลมเส้นบางเป็นฉากหลัง ---------------- */
+  #speckles{ position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+  #speckles .ring{ position:absolute; border:1px solid var(--line-soft); border-radius:50%; opacity:.6; }
+  #speckles .ring.r1{ width:900px;  height:900px;  top:-320px;    right:-260px; }
+  #speckles .ring.r2{ width:1400px; height:1400px; top:38%;       left:-720px; }
+  #speckles .ring.r3{ width:760px;  height:760px;  bottom:-300px; right:-180px; }
+
+  main{ position:relative; z-index:1; }
+
+  /* ---------------- หน้าโหลด ----------------
+     ฉากนี้ปิดด้วย JS อย่างเดียว ถ้าไม่มี JS จะค้างคาจอตลอดไป
+     จึงซ่อนไว้เป็นค่าตั้งต้น แล้วให้โผล่เฉพาะตอนที่ <html> มีคลาส js
+     (สคริปต์บรรทัดเดียวใน <head> เป็นคนใส่ให้) */
+  #loading{ display:none; }
+  html.js #loading{
+    position:fixed; inset:0; z-index:100; background:var(--paper);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:24px;
+    transition:opacity .55s var(--ease), visibility .55s var(--ease);
+    /* กันอีกชั้น เผื่อ script.js โหลดไม่ขึ้น คลาส js ติดแล้วแต่ไม่มีใครมาสั่งปิด
+       ครบ 8 วินาทีให้หายไปเอง คนจะได้ไม่เจอจอค้าง */
+    animation:loading-failsafe 0s linear 8s forwards;
+  }
+  @keyframes loading-failsafe{ to{ opacity:0; visibility:hidden; pointer-events:none; } }
+  html.js #loading.hide{ opacity:0; visibility:hidden; pointer-events:none; }
+  #loading .load-pct{
+    font-family:var(--mono); font-size:clamp(3.4rem,13vw,8rem); font-weight:500;
+    letter-spacing:-.04em; line-height:1;
+  }
+  #loading .load-label{
+    font-family:var(--mono); font-size:.76rem; letter-spacing:.28em; text-transform:uppercase; color:var(--ink-faint);
+  }
+  #loading .bar-track{ position:relative; height:1px; background:var(--line); width:min(420px,72vw); }
+  #loading .bar-fill{ position:absolute; inset:0 auto 0 0; width:0%; background:var(--ink); transition:width .1s linear; }
+
+  /* ---------------- แถบบน ---------------- */
+  .nav-stage{
+    position:sticky; top:0; z-index:40; background:rgba(12,12,14,.82);
+    backdrop-filter:blur(14px); border-bottom:1px solid var(--line-soft);
+  }
+  .nav-inner{
+    max-width:1180px; margin:0 auto; padding:18px 34px;
+    display:flex; align-items:center; justify-content:space-between; gap:24px;
+  }
+  @media (max-width:640px){ .nav-inner{ padding:14px 20px; } }
+  .nav-name{ font-family:var(--mono); font-size:.86rem; line-height:1.35; letter-spacing:.02em; }
+  .nav-name b{ display:block; font-weight:500; }
+  .nav-name span{ display:block; color:var(--ink-faint); }
+  .pill-nav{ display:flex; gap:4px; }
+  .pill-nav a{
+    font-family:var(--mono); font-size:.82rem; color:var(--ink-faint);
+    padding:8px 15px; border-radius:999px;
+    transition:color .25s var(--ease), background-color .25s var(--ease);
+  }
+  .pill-nav a:hover{ color:var(--ink-soft); }
+  .pill-nav a.active{ color:var(--paper); background:var(--ink); }
+  @media (max-width:560px){ .pill-nav a{ padding:7px 10px; font-size:.75rem; } }
+  /* ที่จอ 390px เมนูต้องการ ~405px แต่มีที่ให้ 350px ปุ่มสุดท้าย (Contacts) จึงหลุดขอบจอ
+     ซ่อนชื่อมุมซ้ายบนจอเล็กแทน ไม่เสียอะไรเพราะชื่อตัวใหญ่อยู่ถัดลงไปไม่กี่พิกเซล */
+  @media (max-width:520px){
+    .nav-name{ display:none; }
+    .nav-inner{ justify-content:flex-end; }
+  }
+
+  section{ padding:120px 0 40px; }
+  section#home{ padding-top:96px; }
+  @media (max-width:640px){ section{ padding:80px 0 30px; } }
+
+  /* ป้ายกำกับหัวข้อ แบบ ... /about ... */
+  .sec-label{
+    font-family:var(--mono); font-size:.78rem; color:var(--ink-faint);
+    letter-spacing:.06em; margin-bottom:30px;
+  }
+  .sec-label::before{ content:"... "; }
+  .sec-label::after{ content:" ..."; }
+
+  /* ---------------- hero ---------------- */
+  .hero-title{
+    font-family:var(--mono); font-weight:500;
+    font-size:clamp(2.6rem,10.5vw,8.2rem); line-height:.98; letter-spacing:-.045em;
+    text-transform:uppercase;
+  }
+  .hero-title .row{ display:flex; align-items:center; gap:26px; flex-wrap:wrap; }
+  .hero-title .row.end{ justify-content:flex-end; }
+  .hero-line{ display:block; overflow:hidden; }
+  /* ชื่อเลื่อนขึ้นมาจากใต้เส้น โดยเริ่มจากถูกดันลงไปพ้นกรอบ แล้ว JS ใส่คลาส in ให้เลื่อนขึ้น
+     ต้องผูกกับคลาส js ด้วย ไม่งั้นเบราว์เซอร์ที่ไม่รัน JS จะไม่มีใครมาใส่ in ให้
+     ชื่อก็ค้างอยู่ใต้กรอบตลอดไป หัวเรื่องของหน้าหายทั้งก้อน */
+  .hero-line > span{ display:block; }
+  html.js .hero-line > span{
+    transform:translateY(105%); transition:transform 1s var(--ease);
+    animation:hero-failsafe 0s linear 8s forwards;   /* กันเหนียวแบบเดียวกับที่อื่น */
+  }
+  @keyframes hero-failsafe{ to{ transform:none; } }
+  html.js .hero-title.in .hero-line > span{ transform:none; }
+
+  /* ชิดบนทั้งคู่ ตอนตัวเล่นเพลงสูง 352px ฝั่งขวาสูงกว่าซ้าย 281px
+     ถ้าสั่งให้จบเสมอกัน ของฝั่งซ้ายจะถูกดันลงไปจนเกิดช่องโหว่กลางคอลัมน์ 311px */
+  .hero-sub{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:40px; margin-top:44px; align-items:start; }
+  @media (max-width:820px){ .hero-sub{ grid-template-columns:1fr; gap:26px; } }
+  /* ดันเฉพาะคอลัมน์ซ้ายลงมา ให้ห่างจากประโยคด้านบน
+     ไม่ใช้ margin-top ที่ .hero-sub เพราะจะดันตัวเล่นเพลงลงตามไปด้วยแล้วหน้าแรกสูงขึ้น
+     ฝั่งขวาสูงกว่าอยู่แล้ว การดันซ้ายลงมาจึงไม่ทำให้หน้ายาวขึ้นเลย */
+  @media (min-width:821px){ .hero-sub > div:first-child{ margin-top:52px; } }
+  .hero-role{ font-family:var(--mono); font-size:.92rem; color:var(--ink-soft); min-height:1.6em; }
+  /* อยู่ในช่องว่างซ้ายของ AMARIT จึงต้องล้างค่าที่สืบมาจาก .hero-title (ตัวใหญ่ ตัวพิมพ์ใหญ่ บรรทัดชิด) */
+  .hero-tag{
+    margin:0; text-align:left; text-transform:none;
+    font-family:var(--mono); font-weight:500;
+    font-size:clamp(1.15rem,2.2vw,1.72rem); line-height:1.2; letter-spacing:-.02em;
+  }
+  /* ตัวห่อที่เป็น flex item จริง ระยะและการจัดตำแหน่งจึงอยู่ตรงนี้ ไม่ใช่ที่ตัวหนังสือ
+     ดันชิดล่างของแถว AMARIT แทนที่จะลอยกลางแถว จะได้ห่างจาก TIWARAT ขึ้น
+     margin-bottom ติดลบดันต่ออีกนิดให้บรรทัดล่างอยู่ระดับเดียวกับฐานของ AMARIT
+     ใช้วิธีนี้แทนการเว้นระยะด้านบน เพราะการเว้นด้านบนจะดันให้ AMARIT เลื่อนลงตามไปด้วย */
+  .tag-line{ align-self:flex-end; margin-bottom:-14px; }
+  /* เลื่อนขึ้นมาช้ากว่าชื่อเล็กน้อย ให้ชื่อมาก่อนแล้วประโยคตามทีหลัง */
+  .hero-title.in .tag-line > span{ transition-delay:.16s; }
+  @media (min-width:821px){ .hero-title .row.end{ justify-content:space-between; } }
+  /* จอแคบ: ดันลงไปอยู่บรรทัดของตัวเองใต้ AMARIT ไม่งั้นสองก้อนจะเบียดกันในแถวเดียว */
+  @media (max-width:820px){
+    .hero-tag{ font-size:clamp(1.1rem,4.4vw,1.6rem); }
+    .tag-line{ order:1; width:100%; align-self:auto; margin-bottom:0; }
+  }
+  /* เคอร์เซอร์กะพริบมีความหมายเฉพาะตอนมีเอฟเฟกต์พิมพ์ดีด
+     ถ้าไม่มี JS มันจะเป็นแค่แท่งสี่เหลี่ยมค้างอยู่เฉย ๆ จึงซ่อนไปเลย */
+  .type-caret{ display:none; }
+  html.js .type-caret{
+    display:inline-block; width:8px; height:1em; background:var(--ink);
+    margin-left:4px; vertical-align:-2px; animation:caret 1.05s steps(1) infinite;
+  }
+  @keyframes caret{ 50%{ opacity:0; } }
+
+  /* ---------------- ปุ่ม ---------------- */
+  .btn{
+    display:inline-flex; align-items:center; gap:10px; font-family:var(--mono);
+    font-size:.84rem; letter-spacing:.02em; padding:12px 22px; border-radius:999px;
+    border:1px solid var(--line); background:transparent; color:var(--ink); cursor:pointer;
+    transition:background-color .3s var(--ease), color .3s var(--ease), border-color .3s var(--ease);
+  }
+  .btn:hover{ background:var(--ink); color:var(--paper); border-color:var(--ink); }
+  .btn-primary{ background:var(--ink); color:var(--paper); border-color:var(--ink); }
+  .btn-primary:hover{ background:transparent; color:var(--ink); border-color:var(--line); }
+  .btn svg{ width:15px; height:15px; }
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible{ outline:1.5px solid var(--ink); outline-offset:3px; }
+  .hero-cta{ display:flex; gap:12px; margin-top:26px; flex-wrap:wrap; }
+
+  /* ---------------- about ---------------- */
+  .about-grid{ display:grid; grid-template-columns:1.25fr .75fr; gap:52px; align-items:start; }
+  @media (max-width:900px){ .about-grid{ grid-template-columns:1fr; gap:32px; } }
+  /* บล็อกบอกตัวตนสามบรรทัด อ่านเป็นชุดเดียว ไม่มีป้ายกำกับซ้ำ */
+  .about-id{
+    display:flex; flex-direction:column; gap:9px;
+    font-family:var(--mono); font-size:clamp(.95rem,1.5vw,1.08rem);
+    line-height:1.4; letter-spacing:-.01em; color:var(--ink); margin-bottom:30px;
+  }
+  .about-btns{ display:flex; gap:12px; margin-top:30px; flex-wrap:wrap; }
+  .about-side{ display:flex; flex-direction:column; gap:14px; }
+  /* ---------------- บัตรห้อยสายคล้อง ---------------- */
+  /* .badge-swing คือชิ้นเดียวที่หมุน จุดหมุนอยู่ที่ห่วงบนสุด
+     ทุกอย่างใต้ห่วง (สาย คลิป บัตร) จึงเหวี่ยงตามกันเป็นพวงเดียว */
+  .badge-rig{ position:relative; }
+  /* จุดหมุนอยู่เหนือขอบบนขึ้นไป เพราะสายคล้องถูกตัดให้เหมือนห้อยลงมาจากที่สูงกว่านั้น
+     ลูกตุ้มที่ยาวขึ้นจะแกว่งช้าและนิ่งกว่า ซึ่งตรงกับของจริง */
+  .badge-swing{
+    position:relative; display:flex; flex-direction:column; align-items:center;
+    transform-origin:50% -24px; will-change:transform; touch-action:pan-y;
+  }
+  /* สายไล่จางที่หัว ให้อ่านว่าต่อขึ้นไปข้างบน และวางทับบัตรเพื่อให้ตะขอคล้องผ่านรูจริง */
+  .rig-strap{
+    width:120px; height:290px; overflow:visible;
+    position:relative; z-index:4; margin-bottom:-44px;
+    -webkit-mask-image:linear-gradient(to bottom, transparent 0, #000 52px);
+    mask-image:linear-gradient(to bottom, transparent 0, #000 52px);
+  }
+  .rig-strap .hem{ fill:#22222A; stroke:#0E0E12; stroke-width:.8; }
+  .rig-strap .stitch{ fill:none; stroke:#6A6A76; stroke-width:.9; stroke-dasharray:2.5 2.5; opacity:.5; }
+  .rig-strap .ring{ fill:none; stroke:url(#mtl); stroke-width:3.2; }
+  .rig-strap .eye{ fill:none; stroke:url(#mtl); stroke-width:2.6; }
+  .rig-strap .clasp{ fill:url(#mtl2); }
+  .rig-strap .gate{ fill:none; stroke:#8A8A98; stroke-width:1.2; opacity:.45; stroke-linecap:round; }
+  .badge-card{
+    position:relative; width:100%; padding:30px 26px 24px;
+    border:1px solid var(--line); border-radius:18px; background:var(--card);
+    box-shadow:0 34px 60px -34px #000, 0 2px 0 rgba(255,255,255,.03) inset;
+  }
+  /* ช่องเสียบคลิปที่หัวบัตร เจาะให้เห็นพื้นหลังจริง */
+  .badge-card::before{
+    content:""; position:absolute; top:8px; left:50%; transform:translateX(-50%);
+    width:14px; height:5px; border-radius:99px; background:#050507;
+    box-shadow:0 0 0 1px rgba(255,255,255,.14) inset;
+  }
+  /* เลย์เอาต์ตามบัตรตัวอย่าง: รูปใหญ่เกือบเต็มความกว้าง > ชื่อ > ตำแหน่ง >
+     เว้นว่างยาว ๆ > ข้อมูลติดต่อซ้ายล่าง คู่กับมาร์กขวาล่าง
+     ที่ว่างตรงกลางคือส่วนสำคัญของแบบนี้ ถ้าอัดเนื้อหาเต็มจะเสียคาแรกเตอร์ทันที */
+  .bc-photo{ overflow:hidden; border-radius:2px; background:var(--paper-2); aspect-ratio:1/1; }
+  .bc-photo img{
+    width:100%; height:100%; object-fit:cover; object-position:50% 15%; display:block;
+    filter:grayscale(1) contrast(1.06) brightness(.97);
+    transition:filter .55s var(--ease);
+  }
+  .badge-rig:hover .bc-photo img{ filter:grayscale(0) contrast(1.02) brightness(1); }
+
+  /* ชื่อเป็นตัวพิมพ์ปกติ ไม่ใช่ตัวพิมพ์ใหญ่ทั้งหมด ตามตัวอย่าง */
+  .bc-big{
+    margin-top:18px; font-family:var(--sans); font-weight:600; font-size:1.5rem;
+    line-height:1.12; letter-spacing:-.02em; color:var(--ink);
+  }
+  .bc-role{
+    margin-top:5px; font-family:var(--mono); font-size:.62rem; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--ink-soft);
+  }
+  .bc-foot{
+    display:flex; align-items:flex-end; justify-content:space-between; gap:12px;
+    margin-top:58px; font-family:var(--mono);
+  }
+  .bc-contact{ display:flex; flex-direction:column; gap:2px; font-size:.6rem; color:var(--ink-faint); }
+  .bc-mark{ display:flex; flex-direction:column; align-items:flex-end; gap:1px; text-align:right; }
+  .bc-mark b{
+    font-weight:500; font-size:.62rem; letter-spacing:.2em;
+    text-transform:uppercase; color:var(--ink-soft);
+  }
+  .bc-mark span{ font-size:.52rem; letter-spacing:.2em; color:var(--ink-faint); }
+  @media (max-width:900px){ .badge-rig{ max-width:320px; margin:0 auto; } }
+
+  /* ---------------- Daily Rotation ---------------- */
+  /* ถอดกรอบการ์ดออก เพราะตัวฝังของ Spotify มีกรอบมนของตัวเองอยู่แล้ว ซ้อนกันจะกลายเป็นกล่องในกล่อง
+     แคบและชิดขวาให้ขอบตรงกับ AMARIT ที่อยู่เหนือขึ้นไป */
+  .rotation{
+    max-width:420px; margin-left:auto;
+    background:none; border:none; padding:0;
+  }
+  /* จอแคบ หน้าแรกเหลือคอลัมน์เดียว การ์ดจึงกางเต็มความกว้างตามไปด้วย */
+  @media (max-width:820px){ .rotation{ max-width:none; margin-left:0; } }
+  .rot-head{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    padding-bottom:10px; opacity:.6;
+    font-family:var(--mono); font-size:.7rem; letter-spacing:.24em; text-transform:uppercase;
+    color:var(--ink-faint);
+  }
+  /* แท่งอีควอไลเซอร์ ขยับเบา ๆ พอให้รู้ว่าเป็นเรื่องเพลง */
+  .rot-head .eq{ display:flex; align-items:flex-end; gap:3px; height:13px; }
+  .rot-head .eq i{ width:2px; height:100%; background:var(--ink-soft); transform-origin:bottom; animation:eq 1.2s ease-in-out infinite; }
+  .rot-head .eq i:nth-child(2){ animation-delay:.15s; }
+  .rot-head .eq i:nth-child(3){ animation-delay:.3s; }
+  .rot-head .eq i:nth-child(4){ animation-delay:.45s; }
+  @keyframes eq{ 0%,100%{ transform:scaleY(.25); } 50%{ transform:scaleY(1); } }
+  @media (prefers-reduced-motion: reduce){ .rot-head .eq i{ animation:none; transform:scaleY(.55); } }
+
+  .rot-body{ margin-top:0; }
+  /* ย้ายมาอยู่ใต้สองคอลัมน์แบบเต็มความกว้าง เพราะในคอลัมน์ขวากว้างแค่ ~355px
+     ตัวฝังของ Spotify จะตัดชื่อเพลย์ลิสต์ทิ้ง และทำให้คอลัมน์ขวายาวกว่าซ้าย 476px */
+  .rot-body iframe{ display:block; width:100%; border:0; border-radius:12px; }
+  .rot-body iframe{ width:100%; border:0; border-radius:12px; display:block; }
+  .rot-empty{
+    border:1px dashed var(--line); border-radius:var(--radius-md); padding:24px 18px;
+    display:flex; flex-direction:column; align-items:center; gap:8px; text-align:center;
+  }
+  .rot-empty svg{ width:26px; height:26px; color:var(--ink-faint); }
+  .rot-empty p{ margin:0; font-size:.86rem; color:var(--ink-soft); }
+  .rot-empty small{ font-family:var(--mono); font-size:.7rem; color:var(--ink-faint); }
+
+  /* ---------------- การ์ดทักษะ ---------------- */
+  .skill-cards{ display:flex; flex-direction:column; gap:14px; margin-top:34px; }
+  .skill-card{
+    border:1px solid var(--line); border-radius:var(--radius-lg); padding:18px 22px;
+    background:var(--paper-2); transition:border-color .3s var(--ease);
+  }
+  .skill-card:hover{ border-color:var(--ink-faint); }
+  .skill-card h3{ font-size:.98rem; font-weight:500; margin-bottom:8px; }
+  .skill-card .list{ font-family:var(--mono); font-size:.8rem; color:var(--ink-soft); line-height:1.95; }
+
+  /* การศึกษา: ใช้เส้นคั่นแบบเดียวกับตารางประสบการณ์ ไม่ใช่กล่องซ้อนกล่อง */
+  .edu-block{ margin-top:34px; border-top:1px solid var(--line); }
+  .edu-head{
+    font-family:var(--mono); font-size:.7rem; letter-spacing:.18em;
+    text-transform:uppercase; color:var(--ink-faint); padding:16px 0 2px;
+  }
+  .edu-row{ display:flex; gap:24px; padding:15px 0; border-bottom:1px solid var(--line-soft); }
+  .edu-row:last-child{ border-bottom:0; }
+  .edu-when{ flex:0 0 116px; font-family:var(--mono); font-size:.78rem; color:var(--ink-faint); padding-top:3px; }
+  .edu-what b{ display:block; font-weight:500; font-size:.95rem; color:var(--ink); }
+  .edu-what span{ display:block; margin-top:5px; font-size:.86rem; color:var(--ink-soft); }
+  @media (max-width:640px){
+    .edu-row{ flex-direction:column; gap:6px; }
+    .edu-when{ flex:none; padding-top:0; }
+  }
+
+  /* ---------------- ตารางประสบการณ์ ---------------- */
+  .work-title{
+    font-family:var(--mono); font-weight:500; text-transform:uppercase;
+    font-size:clamp(2.2rem,7vw,5rem); letter-spacing:-.04em; line-height:1;
+    text-align:right; margin-bottom:26px;
+  }
+  .work-table{ border-top:1px solid var(--line); }
+  .work-row{
+    display:grid; grid-template-columns:190px 1fr 1fr; gap:22px; align-items:center;
+    padding:18px 20px; border-bottom:1px solid var(--line);
+    transition:background-color .35s var(--ease), color .35s var(--ease);
+  }
+  .work-row:hover{ background:var(--ink); color:var(--paper); }
+  .work-row .yr{ font-family:var(--mono); font-size:.86rem; }
+  .work-row .yr small{ display:block; color:var(--ink-faint); font-size:.74rem; }
+  .work-row:hover .yr small{ color:rgba(12,12,14,.6); }
+  .work-row .org{ font-size:.95rem; }
+  .work-row .role{ font-family:var(--mono); font-size:.84rem; color:var(--ink-soft); }
+  .work-row:hover .role{ color:rgba(12,12,14,.75); }
+  @media (max-width:760px){
+    .work-row{ grid-template-columns:1fr; gap:4px; padding:16px 14px; }
+    .work-title{ text-align:left; }
+  }
+
+  /* ---------------- แท็บผลงาน ---------------- */
+  .tabbar{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:38px; }
+  .tabbtn{
+    display:inline-flex; align-items:center; gap:9px; font-family:var(--mono); font-size:.82rem;
+    padding:10px 20px; border-radius:999px; border:1px solid var(--line);
+    background:transparent; color:var(--ink-faint); cursor:pointer;
+    transition:background-color .3s var(--ease), color .3s var(--ease), border-color .3s var(--ease);
+  }
+  .tabbtn svg{ width:15px; height:15px; }
+  .tabbtn:hover{ color:var(--ink-soft); }
+  .tabbtn.active{ background:var(--ink); color:var(--paper); border-color:var(--ink); }
+  .tabpanel{ display:none; }
+  .tabpanel.active{ display:block; animation:fadein .45s var(--ease); }
+  @keyframes fadein{ from{ opacity:0; transform:translateY(8px);} to{ opacity:1; transform:none; } }
+
+  .grid-3{ display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
+  @media (max-width:980px){ .grid-3{ grid-template-columns:1fr 1fr; } }
+  @media (max-width:640px){ .grid-3{ grid-template-columns:1fr; } }
+  /* แท็บผลงานใช้ 2 คอลัมน์: 4 ใบเต็มพอดีสองแถว และภาพหน้าจอกว้างขึ้นเกือบเท่าตัวจนอ่านตัวเลขในระบบออก
+     แท็บใบรับรองยังเป็น 3 คอลัมน์ตามเดิม เพราะมี 5 ใบและไม่ต้องอ่านรายละเอียดในภาพ */
+  .grid-proj{ grid-template-columns:1fr 1fr; }
+  @media (max-width:640px){ .grid-proj{ grid-template-columns:1fr; } }
+
+  /* ---------------- การ์ดผลงาน ---------------- */
+  .proj-card{
+    background:var(--paper-2); border:1px solid var(--line); border-radius:var(--radius-lg);
+    overflow:hidden; display:flex; flex-direction:column;
+    transition:border-color .35s var(--ease), transform .35s var(--ease);
+  }
+  .proj-card.is-clickable{ cursor:pointer; }
+  .proj-card:hover{ border-color:var(--ink-faint); transform:translateY(-3px); }
+  /* เว้นขอบรอบรูปให้พื้นการ์ดทำหน้าที่เป็นกรอบ ของเดิมรูปชนขอบการ์ดทั้งสามด้าน
+     ภาพหน้าจอที่พื้นมืด (เช่นเว็บนี้เอง) จึงกลืนไปกับการ์ดจนหาขอบรูปไม่เจอ */
+  .proj-thumb{ aspect-ratio:16/10; background:var(--card); position:relative; overflow:hidden;
+    padding:14px; border-bottom:1px solid var(--line); }
+  .proj-thumb.has-img img{
+    width:100%; height:100%; object-fit:cover; object-position:top center; border-radius:9px;
+    filter:grayscale(.4); transition:filter .45s var(--ease);
+  }
+  .proj-card:hover .proj-thumb.has-img img{ filter:none; }
+  .proj-card .proj-thumb::after{
+    content:"อ่านรายละเอียด →"; position:absolute; bottom:12px; right:12px; z-index:2;
+    font-family:var(--mono); font-size:.72rem; background:var(--ink); color:var(--paper);
+    border-radius:999px; padding:5px 13px; opacity:0; transform:translateY(4px);
+    transition:opacity .3s var(--ease), transform .3s var(--ease);
+  }
+  .proj-card:hover .proj-thumb::after, .proj-card:focus-within .proj-thumb::after{ opacity:1; transform:none; }
+  .proj-body{ padding:20px 22px 22px; display:flex; flex-direction:column; gap:11px; flex:1; }
+  .proj-body h3{ font-size:1rem; font-weight:500; line-height:1.45; }
+  .proj-link{ color:inherit; }
+  .proj-card:hover .proj-link{ text-decoration:underline; text-underline-offset:4px; }
+  .proj-body p{ color:var(--ink-soft); font-size:.88rem; flex:1; }
+  .proj-tags{ display:flex; gap:6px; flex-wrap:wrap; }
+  .proj-tags span{
+    font-family:var(--mono); font-size:.7rem; color:var(--ink-soft);
+    border:1px solid var(--line); padding:4px 10px; border-radius:999px;
+  }
+  .proj-meta{
+    display:flex; align-items:center; flex-wrap:wrap; gap:7px; margin-top:auto; padding-top:14px;
+    border-top:1px solid var(--line-soft); font-family:var(--mono); font-size:.7rem; color:var(--ink-faint);
+  }
+  .proj-meta span{ padding:3px 10px; border-radius:999px; border:1px solid var(--line); }
+  .proj-meta .tag-live{ color:var(--ink); border-color:var(--ink-faint); }
+
+  /* ---------------- Tech Stack ---------------- */
+  .stack-group + .stack-group{ margin-top:34px; }
+  .stack-head{ display:flex; align-items:baseline; gap:12px; font-size:1rem; font-weight:500; margin-bottom:18px; }
+  .stack-head .dot{ width:7px; height:7px; border-radius:50%; background:var(--ink); flex:none; align-self:center; }
+  .stack-head small{ font-family:var(--mono); font-size:.76rem; color:var(--ink-faint); font-weight:400; }
+  @media (max-width:520px){ .stack-head{ flex-wrap:wrap; gap:4px 10px; } }
+  .grid-6{ display:grid; grid-template-columns:repeat(6,1fr); gap:12px; }
+  @media (max-width:900px){ .grid-6{ grid-template-columns:repeat(3,1fr); } }
+  @media (max-width:500px){ .grid-6{ grid-template-columns:repeat(2,1fr); } }
+  .tech-card{
+    background:var(--paper-2); border:1px solid var(--line); border-radius:var(--radius-md);
+    padding:20px 10px; display:flex; flex-direction:column; align-items:center; gap:11px; text-align:center;
+    transition:border-color .3s var(--ease), transform .3s var(--ease);
+  }
+  .tech-card:hover{ border-color:var(--ink-faint); transform:translateY(-2px); }
+  .tech-badge{
+    width:42px; height:42px; border-radius:11px; display:flex; align-items:center; justify-content:center;
+    font-family:var(--mono); font-weight:500; font-size:.76rem; color:#fff;
+    filter:grayscale(1) brightness(1.45); transition:filter .35s var(--ease);
+  }
+  .tech-card:hover .tech-badge{ filter:none; }
+  .tech-card .tname{ font-family:var(--mono); font-size:.76rem; color:var(--ink-soft); }
+
+  /* ---------------- ใบรับรอง ---------------- */
+  .cert-card{
+    position:relative; width:100%; font-family:inherit; cursor:pointer; overflow:hidden; padding:16px;
+    background:var(--paper-2); border:1px solid var(--line); border-radius:var(--radius-lg);
+    aspect-ratio:4/3; display:flex; flex-direction:column; justify-content:flex-end; align-items:flex-start;
+    gap:3px; text-align:left; transition:border-color .3s var(--ease), transform .3s var(--ease);
+  }
+  .cert-card:hover{ border-color:var(--ink-faint); transform:translateY(-3px); }
+  .cert-card img{
+    position:absolute; inset:0; z-index:0; width:100%; height:100%; object-fit:cover; object-position:top center;
+    filter:grayscale(1) brightness(.7); transition:filter .4s var(--ease);
+  }
+  .cert-card:hover img{ filter:grayscale(.35) brightness(.85); }
+  /* ฉากมืดหลังตัวหนังสือ ช่วงล่าง 34% ทึบสนิทไม่ไล่เฉด
+     เพราะใบเซอร์เป็นกระดาษขาวที่มีตัวหนังสือของตัวเองอยู่ตรงนั้นพอดี ถ้าไล่เฉดจะทับกันจนอ่านไม่ออก */
+  .cert-card::before{
+    content:""; position:absolute; inset:auto 0 0 0; z-index:1; height:62%;
+    background:linear-gradient(to top,
+      #08080A 0%, #08080A 34%, rgba(8,8,10,.88) 50%,
+      rgba(8,8,10,.55) 70%, rgba(8,8,10,.2) 87%, transparent 100%);
+  }
+  .cert-card .cert-name, .cert-card .cert-org{ position:relative; z-index:2; }
+  .cert-card .cert-name{ font-size:.9rem; font-weight:500; color:var(--ink); line-height:1.45; }
+  .cert-card .cert-org{ font-family:var(--mono); font-size:.72rem; color:var(--ink-soft); }
+  .cert-card::after{
+    content:"ดูเต็มจอ"; position:absolute; top:12px; right:12px; z-index:3;
+    font-family:var(--mono); background:var(--ink); color:var(--paper); border-radius:999px; padding:4px 12px;
+    font-size:.7rem; opacity:0; transform:translateY(-4px);
+    transition:opacity .3s var(--ease), transform .3s var(--ease);
+  }
+  .cert-card:hover::after, .cert-card:focus-visible::after{ opacity:1; transform:none; }
+
+  /* ---------------- lightbox ---------------- */
+  .lightbox{
+    position:fixed; inset:0; z-index:120; padding:28px;
+    background:rgba(8,8,10,.9); backdrop-filter:blur(6px);
+    display:flex; align-items:center; justify-content:center; animation:fadein .28s var(--ease);
+  }
+  .lightbox[hidden]{ display:none; }
+  .lb-inner{
+    position:relative; background:var(--paper-2); border:1px solid var(--line); border-radius:var(--radius-lg);
+    padding:16px; max-width:min(960px,94vw); max-height:90vh; display:flex; flex-direction:column; gap:12px;
+    animation:pop-in .3s var(--ease);
+  }
+  @keyframes pop-in{ from{ opacity:0; transform:scale(.97);} to{ opacity:1; transform:none; } }
+  .lb-close{
+    position:absolute; top:-14px; right:-14px; width:40px; height:40px; border-radius:50%;
+    background:var(--ink); color:var(--paper); border:none; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .lb-stage{ display:flex; align-items:center; justify-content:center; min-height:200px; }
+  .lb-stage img{ max-width:100%; max-height:72vh; border-radius:var(--radius-md); object-fit:contain; }
+  .lb-stage .lb-empty{
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px;
+    width:min(620px,84vw); aspect-ratio:4/3; border:1px dashed var(--line); border-radius:var(--radius-md);
+    background:var(--card); color:var(--ink-faint); text-align:center; padding:20px;
+  }
+  .lb-stage .lb-empty svg{ width:42px; height:42px; }
+  .lb-stage .lb-empty small{ font-family:var(--mono); font-size:.76rem; }
+  .lb-cap{ text-align:center; font-family:var(--mono); font-size:.8rem; color:var(--ink-soft); }
+
+  /* ---------------- show more ---------------- */
+
+  /* ---------------- contact ---------------- */
+  /* วางเป็นแถบเต็มความกว้างแบบเดียวกับ section Work
+     ของเดิมเป็นการ์ดใบเล็กลอยอยู่ซ้ายมือ เหลือพื้นที่ว่างครึ่งจอด้านขวา */
+  /* หัวข้อซ้าย ช่องทางขวา ทั้งแถวคั่นด้วยเส้นบนล่างเหมือนตารางประสบการณ์ */
+  .contact-row{
+    display:flex; align-items:flex-start; justify-content:space-between; gap:30px; flex-wrap:wrap;
+    border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:38px 0;
+  }
+  .contact-title{ font-size:1.65rem; font-weight:500; letter-spacing:-.01em; }
+  .contact-ch{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:16px; }
+  .contact-ch li{
+    display:flex; align-items:center; gap:13px;
+    font-family:var(--mono); font-size:.92rem; color:var(--ink-soft);
+  }
+  .contact-ch svg{ width:17px; height:17px; color:var(--ink-faint); flex:none; }
+  .contact-ch a{ color:var(--ink); border-bottom:1px solid var(--line); transition:border-color .25s var(--ease); }
+  .contact-ch a:hover{ border-color:var(--ink); }
+  @media (max-width:640px){
+    .contact-row{ flex-direction:column; gap:24px; padding:28px 0; }
+    .contact-title{ font-size:1.4rem; }
+  }
+
+  footer{ padding:34px 0 56px; border-top:1px solid var(--line-soft); margin-top:60px; position:relative; z-index:1; }
+  .footer-row{
+    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;
+    font-family:var(--mono); font-size:.78rem; color:var(--ink-faint);
+  }
+
+  /* ---------------- เอฟเฟกต์ตอนเลื่อน ----------------
+     ผูกกับคลาส js เหมือนฉากโหลด ถ้าไม่มี JS เนื้อหาจะแสดงเต็มทันที
+     ไม่ใช่หน้าเปล่าเพราะทุกอย่างถูกตั้ง opacity:0 รอ JS มาสั่งให้โผล่ */
+  html.js [data-reveal]{
+    opacity:0; transform:translateY(20px);
+    transition:opacity .85s var(--ease), transform .85s var(--ease);
+    will-change:opacity, transform;
+    /* กันเหนียวแบบเดียวกับฉากโหลด ครบ 8 วินาทีให้โผล่เองไม่ว่าจะเกิดอะไรขึ้น */
+    animation:reveal-failsafe 0s linear 8s forwards;
+  }
+  @keyframes reveal-failsafe{ to{ opacity:1; transform:none; } }
+  html.js [data-reveal="left"]{ transform:translateX(-22px); }
+  html.js [data-reveal="right"]{ transform:translateX(22px); }
+  html.js [data-reveal].in{ opacity:1; transform:none; }
+  @media (prefers-reduced-motion: reduce){
+    html.js [data-reveal]{ opacity:1 !important; transform:none !important; animation:none; }
+    .hero-line > span{ transform:none !important; }
+    .type-caret{ animation:none; }
+  }

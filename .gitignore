@@ -1,0 +1,17 @@
+# ไฟล์ที่ macOS สร้างเองทุกครั้งที่เปิดโฟลเดอร์ใน Finder
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+
+# ของ editor
+.vscode/
+.idea/
+*.swp
+
+# ไฟล์ชั่วคราวตอนทดสอบ
+__*.html
+sels.json
+
+# ตั้งค่าเครื่องมือในเครื่อง ไม่เกี่ยวกับตัวเว็บ
+.claude/

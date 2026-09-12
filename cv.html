@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CV · Tiva</title>
+<meta name="description" content="ประวัติย่อ (CV) ของ ทิวารัตน์ อัมฤทธิ์ (แป้ง) — Business Development และนักศึกษา ป.ตรี IT ม.ศรีปทุม">
+<meta name="robots" content="noindex">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* โทนเดียวกับหน้า Portfolio — ขาวดำ ฟอนต์ IBM Plex
+     บนจอเป็นพื้นเข้ม ส่วนตอนพิมพ์สลับเป็นพื้นขาวอัตโนมัติ (ดูบล็อก @media print ท้ายไฟล์)
+     เพราะ CV พื้นดำเปลืองหมึกและอ่านยากบนกระดาษ */
+  :root{
+    --paper:#0C0C0E; --paper-2:#131316; --card:#17171B;
+    --line:#2B2B33; --line-soft:#1F1F25;
+    --ink:#F2F2F0; --ink-soft:#A2A2AA; --ink-faint:#6B6B75;
+    /* ไฟล์นี้ไม่ได้โหลด style.css จึงต้องประกาศสายฟอนต์เองให้ตรงกัน
+       IBM Plex Mono ไม่มีอักษรไทย ถ้าไม่คั่น Plex Sans Thai ไว้ ข้อความไทย
+       ในหัวข้อ วันที่ และชื่อบริษัท จะตกไปใช้ฟอนต์ระบบ กลายเป็นคนละหน้าตากับเนื้อความ */
+    --mono:"IBM Plex Mono", "IBM Plex Sans Thai", ui-monospace, SFMono-Regular, Menlo, monospace;
+    --sans:"IBM Plex Sans Thai","IBM Plex Sans", system-ui, -apple-system, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:var(--sans);
+    font-size:14px; line-height:1.62; -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{margin:0; font-weight:600; letter-spacing:-.01em;}
+  a{color:inherit;}
+
+  /* ---------- แถบเครื่องมือ (ไม่ติดไปตอนพิมพ์) ---------- */
+  .toolbar{
+    max-width:210mm; margin:22px auto 0; padding:0 6mm;
+    display:flex; justify-content:space-between; align-items:center; gap:14px; flex-wrap:wrap;
+  }
+  .toolbar a, .toolbar button{
+    font-family:var(--mono); font-size:.82rem; cursor:pointer;
+    border-radius:999px; padding:10px 20px; border:1px solid var(--line);
+    background:transparent; color:var(--ink); text-decoration:none;
+    display:inline-flex; align-items:center; gap:7px;
+    transition:background-color .25s, color .25s, border-color .25s;
+  }
+  .toolbar a:hover{ background:var(--ink); color:var(--paper); border-color:var(--ink); }
+  .toolbar button{ background:var(--ink); border-color:var(--ink); color:var(--paper); }
+  .toolbar button:hover{ background:transparent; color:var(--ink); border-color:var(--line); }
+
+  /* ---------- หน้ากระดาษ ---------- */
+  .sheet{
+    max-width:210mm; margin:18px auto 44px; background:var(--card);
+    padding:14mm 13mm; border:1px solid var(--line); border-radius:14px;
+  }
+
+  header.cv-head{ padding-bottom:16px; border-bottom:1px solid var(--line); }
+  .cv-head h1{ font-size:1.72rem; line-height:1.25; }
+  .cv-head .en{
+    margin-top:2px; font-family:var(--mono); font-size:.9rem; color:var(--ink-soft);
+    letter-spacing:.16em; text-transform:uppercase;
+  }
+  .cv-head .role{ margin-top:9px; font-size:.94rem; color:var(--ink-soft); }
+
+  .cols{ display:grid; grid-template-columns:1fr 1.85fr; gap:26px; margin-top:20px; }
+
+  section{ margin-bottom:20px; }
+  .job, .proj, .edu-item, .cert, .skill-group{ break-inside:avoid; }
+  h2.sec{
+    font-family:var(--mono); font-size:.7rem; font-weight:500;
+    letter-spacing:.22em; text-transform:uppercase;
+    color:var(--ink-faint); padding-bottom:6px; margin-bottom:11px;
+    border-bottom:1px solid var(--line);
+  }
+
+  /* ---------- ซ้าย ---------- */
+  .contact{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:7px; font-size:.86rem; }
+  .contact li{ display:flex; gap:9px; align-items:baseline; }
+  .contact .k{ color:var(--ink-faint); flex:none; width:16px; text-align:center; }
+  .contact a{ text-decoration:none; border-bottom:1px solid var(--line); word-break:break-all; }
+
+  .edu-item{ margin-bottom:13px; }
+  .edu-item .deg{ font-weight:600; font-size:.92rem; line-height:1.45; }
+  .edu-item .org{ font-size:.84rem; color:var(--ink-soft); }
+  .edu-item .yr{ font-family:var(--mono); font-size:.74rem; color:var(--ink-faint); letter-spacing:.06em; }
+  .edu-item .gpa{
+    display:inline-block; margin-top:4px; font-family:var(--mono); font-size:.72rem;
+    border:1px solid var(--line); color:var(--ink-soft); padding:2px 10px; border-radius:999px;
+  }
+
+  .skill-group{ margin-bottom:12px; }
+  .skill-group .lbl{
+    font-family:var(--mono); font-size:.66rem; letter-spacing:.18em; text-transform:uppercase;
+    color:var(--ink-faint); margin-bottom:6px;
+  }
+  .chips{ display:flex; flex-wrap:wrap; gap:5px; }
+  .chips span{
+    font-family:var(--mono); font-size:.72rem; padding:3px 10px; border-radius:999px;
+    background:transparent; border:1px solid var(--line); color:var(--ink-soft);
+  }
+  .chips.core span{ border-color:var(--ink-faint); color:var(--ink); }
+
+  .lang{ display:flex; justify-content:space-between; align-items:center; font-size:.86rem; margin-bottom:6px; }
+  .lang .dots{ display:flex; gap:4px; }
+  .lang .dots i{ width:8px; height:8px; border-radius:50%; border:1px solid var(--line); display:block; }
+  .lang .dots i.on{ background:var(--ink); border-color:var(--ink); }
+
+  .cert{ font-size:.83rem; margin-bottom:10px; }
+  .cert .t{ font-weight:500; line-height:1.42; }
+  .cert .o{ font-family:var(--mono); color:var(--ink-faint); font-size:.72rem; letter-spacing:.04em; }
+
+  /* ---------- ขวา ---------- */
+  .summary{ font-size:.9rem; color:var(--ink-soft); }
+  .summary strong{ color:var(--ink); font-weight:600; }
+
+  .job{ position:relative; padding-left:19px; padding-bottom:16px; }
+  .job::before{ content:""; position:absolute; left:0; top:7px; width:7px; height:7px; border-radius:50%; background:var(--ink); }
+  .job::after{ content:""; position:absolute; left:3px; top:18px; bottom:0; width:1px; background:var(--line); }
+  .job:last-child{ padding-bottom:0; }
+  .job:last-child::after{ display:none; }
+  .job .top{ display:flex; justify-content:space-between; gap:12px; align-items:baseline; flex-wrap:wrap; }
+  .job .pos{ font-weight:600; font-size:.96rem; }
+  .job .when{ font-family:var(--mono); font-size:.72rem; color:var(--ink-faint); white-space:nowrap; letter-spacing:.04em; }
+  .job .org{ font-family:var(--mono); font-size:.76rem; color:var(--ink-soft); letter-spacing:.08em; margin-bottom:5px; }
+  .job ul{ margin:0; padding-left:16px; font-size:.86rem; color:var(--ink-soft); }
+  .job ul li{ margin-bottom:2px; }
+
+  .proj{ padding:11px 0; border-bottom:1px solid var(--line-soft); }
+  .proj:last-child{ border-bottom:none; padding-bottom:0; }
+  .proj .n{ font-weight:600; font-size:.92rem; }
+  .proj .d{ font-size:.84rem; color:var(--ink-soft); }
+  .proj .meta{ margin-top:5px; display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
+  .proj .meta span{
+    font-family:var(--mono); font-size:.68rem; padding:2px 9px; border-radius:999px;
+    background:transparent; border:1px solid var(--line); color:var(--ink-faint);
+  }
+  .proj .meta span.live{ border-color:var(--ink-faint); color:var(--ink); }
+  .proj .meta a{ font-family:var(--mono); font-size:.7rem; color:var(--ink); text-decoration:none; border-bottom:1px solid var(--ink-faint); }
+
+  /* ช่องที่ยังต้องเติมเอง — เห็นชัดในจอ และจะไม่หลุดไปตอนพิมพ์โดยไม่รู้ตัว */
+  .todo{ background:#FFE9A8; color:#7A5A00; font-weight:600; padding:0 6px; border-radius:4px; font-size:.85em; }
+
+  /* ต้องระบุ screen เท่านั้น — หน้า A4 กว้างราว 710px ซึ่งต่ำกว่า 760px
+     ถ้าไม่กัน กฎนี้จะไปมีผลตอนพิมพ์ด้วย แล้ว CV จะยุบเหลือคอลัมน์เดียวยาวเป็นเท่าตัว */
+  @media screen and (max-width:760px){
+    .cols{ grid-template-columns:1fr; gap:8px; }
+    .sheet{ padding:8mm 6mm; margin:12px 10px 30px; }
+  }
+
+  /* ---------- ตอนพิมพ์ / บันทึกเป็น PDF ---------- */
+  @page{ size:A4; margin:10mm; }
+  @media print{
+    /* สลับชุดสีเป็นพื้นขาว ทุกอย่างอ้างตัวแปรอยู่แล้ว จึงเปลี่ยนที่เดียวจบ */
+    :root{
+      --paper:#FFFFFF; --paper-2:#F6F6F7; --card:#FFFFFF;
+      --line:#D5D5DA; --line-soft:#E6E6EA;
+      --ink:#141418; --ink-soft:#3C3C45; --ink-faint:#6C6C77;
+    }
+    /* ย่อทั้งแผ่นด้วยอัตราส่วนเดียว ไม่ไล่บีบระยะทีละจุด
+       วิธีไล่บีบทำให้สัดส่วนเพี้ยน เพราะบางค่าลดได้มากบางค่าลดไม่ได้
+       zoom ย่อทุกอย่างพร้อมกันเท่า ๆ กัน ไฟล์ที่พิมพ์จึงหน้าตาเหมือนบนจอเป๊ะ แค่เล็กลง */
+    .sheet{ zoom:0.80; max-width:none; margin:0; padding:0; border:none; border-radius:0; background:#fff; }
+    body{ background:#fff; }
+    .toolbar{ display:none !important; }
+    a{ text-decoration:none; }
+    /* บังคับให้เส้นบาง ๆ กับชิปติดไปด้วย ไม่งั้นเบราว์เซอร์จะตัดพื้นหลังทิ้ง */
+    *{ -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <!-- วิธีบันทึก (เก็บไว้เป็นหมายเหตุ ไม่ต้องขึ้นบนหน้าเว็บ):
+       กดปุ่มบันทึกเป็น PDF > ปลายทางเลือก Save as PDF > กระดาษ A4 > เปิด Background graphics
+       ถ้าไม่เปิด Background graphics เส้นคั่นกับกรอบชิปจะหายไปจากไฟล์ที่ได้ -->
+  <span>
+    <a href="index.html">← กลับหน้า Portfolio</a>
+    <button type="button" onclick="window.print()">บันทึกเป็น PDF</button>
+  </span>
+</div>
+
+<div class="sheet">
+
+  <header class="cv-head">
+    <h1>ทิวารัตน์ อัมฤทธิ์ <span style="font-size:.6em; color:var(--ink-faint); font-weight:400;">(แป้ง)</span></h1>
+    <div class="en">Tiwarat Amarit</div>
+  </header>
+
+  <div class="cols">
+
+    <!-- ================= คอลัมน์ซ้าย ================= -->
+    <div>
+      <section>
+        <h2 class="sec">ติดต่อ</h2>
+        <ul class="contact">
+          <li><span class="k">✉</span><a href="mailto:Exp.ziix@gmail.com">Exp.ziix@gmail.com</a></li>
+          <li><span class="k">⌂</span>กรุงเทพมหานคร</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2 class="sec">การศึกษา</h2>
+        <div class="edu-item">
+          <div class="deg">ปริญญาตรี สาขาเทคโนโลยีสารสนเทศ</div>
+          <div class="org">มหาวิทยาลัยศรีปทุม</div>
+          <div class="yr">กำลังศึกษา</div>
+        </div>
+        <div class="edu-item">
+          <div class="deg">ปวส. เทคโนโลยีธุรกิจดิจิทัล</div>
+          <div class="org">วิทยาลัยเทคโนโลยีระยองบริหารธุรกิจ</div>
+          <div class="yr">2021 – 2023</div>
+          <div class="gpa">เกรดเฉลี่ย 3.82</div>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="sec">ทักษะ</h2>
+        <div class="skill-group">
+          <div class="lbl">Development</div>
+          <div class="chips core">
+            <span>Google Apps Script</span><span>Python</span><span>Django</span>
+            <span>SQLite</span><span>REST API</span><span>Git / GitHub</span>
+          </div>
+        </div>
+        <div class="skill-group">
+          <div class="lbl">Front-end</div>
+          <div class="chips"><span>HTML</span><span>CSS</span><span>JavaScript</span><span>Bootstrap</span><span>HtmlService</span></div>
+        </div>
+        <div class="skill-group">
+          <div class="lbl">Data</div>
+          <div class="chips">
+            <span>ระบบ ERP</span><span>Google Sheets</span>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="sec">ภาษา</h2>
+        <div class="lang"><span>ไทย</span><span class="dots"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span></div>
+        <div class="lang"><span>อังกฤษ</span><span class="dots"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span></div>
+      </section>
+
+      <section>
+        <h2 class="sec">ใบรับรอง</h2>
+        <div class="cert"><div class="t">การออกแบบ UX/UI เพื่อดึงดูดความสนใจของผู้ใช้</div><div class="o">TDGA · สพร. — 2024</div></div>
+        <div class="cert"><div class="t">Development and Basic Concepts of Cloud Computing</div><div class="o">Huawei Talent — 2025</div></div>
+        <div class="cert"><div class="t">Basic Network สำหรับมือใหม่สาย IT</div><div class="o">กรมพัฒนาฝีมือแรงงาน × CIPAT — 2024</div></div>
+        <div class="cert"><div class="t">Basic Cybersecurity</div><div class="o">กรมพัฒนาฝีมือแรงงาน — 2025</div></div>
+        <div class="cert"><div class="t">การเริ่มต้นเป็นผู้ประกอบการรายใหม่</div><div class="o">Thai MOOC · มทร.ธัญบุรี — 2026</div></div>
+      </section>
+    </div>
+
+    <!-- ================= คอลัมน์ขวา ================= -->
+    <div>
+      <section>
+        <h2 class="sec">เกี่ยวกับฉัน</h2>
+        <p class="summary" style="margin:0;">
+          ดูแลงานพัฒนาธุรกิจ และงานธุรการบัญชี พร้อมเขียนระบบภายในให้ทีมใช้เอง
+          ควบคู่กับการเรียนปริญญาตรีสาขาเทคโนโลยีสารสนเทศ
+        </p>
+      </section>
+
+      <section>
+        <h2 class="sec">ประสบการณ์ทำงาน</h2>
+
+        <div class="job">
+          <div class="top"><span class="pos">Business Development</span><span class="when">พ.ย. 2024 – ปัจจุบัน</span></div>
+          <div class="org">บริษัท พีโฟร์ดิจิตอล กรุ๊ป จำกัด</div>
+          <ul>
+            <li>เขียนเครื่องมือภายในให้ทีมใช้ แทนงานที่เคยทำมือทุกวัน ตั้งแต่คุยกับผู้ใช้ ออกแบบวิธีแก้ จนส่งมอบและดูแลต่อ</li>
+            <li>รับผิดชอบงานพัฒนาธุรกิจ และธุรการบัญชีควบคู่กัน</li>
+            <li>ปฏิบัติงานสหกิจศึกษาที่บริษัทเดียวกัน (ก.ย. – ธ.ค. 2026)</li>
+          </ul>
+        </div>
+
+        <div class="job">
+          <div class="top"><span class="pos">Operator Production</span><span class="when">ก.ย. – พ.ย. 2023</span></div>
+          <div class="org">CHUHATSU (THAILAND) CO., LTD.</div>
+          <ul>
+            <li>งานประกอบและควบคุมเครื่องจักรในสายการผลิต</li>
+          </ul>
+        </div>
+
+        <div class="job">
+          <div class="top"><span class="pos">Warehouse &amp; Production Intern</span><span class="when">พ.ย. 2022 – ม.ค. 2023</span></div>
+          <div class="org">SANKO DIECASTING (THAILAND) PUB CO., LTD.</div>
+          <ul>
+            <li>ดูแลสต็อกในระบบ จัดผังคลังสินค้า และสรุปรายงานการผลิตรายวัน</li>
+          </ul>
+        </div>
+
+        <div class="job">
+          <div class="top"><span class="pos">Quality Control</span><span class="when">2016 – พ.ย. 2018</span></div>
+          <div class="org">EASTERN PLASTECH CO., LTD.</div>
+          <ul>
+            <li>ตรวจสอบคุณภาพงานผลิตให้ได้ตามมาตรฐาน</li>
+          </ul>
+        </div>
+
+      </section>
+
+      <section>
+        <h2 class="sec">ผลงาน</h2>
+
+        <div class="proj">
+          <div class="n">AR Dashboard — ระบบติดตามลูกหนี้การค้า</div>
+          <div class="d">รวมข้อมูลลูกหนี้ที่เคยกระจายอยู่หลายระบบมาไว้ที่เดียว จับคู่เงินเข้ากับใบที่ค้าง ส่งอีเมลติดตามและแจ้งเตือนให้เอง </div>
+          <div class="meta"><span class="live">ใช้งานจริงที่บริษัท</span></div>
+        </div>
+
+        <div class="proj">
+          <div class="n">ระบบคำนวณค่าอาหารกลางวัน</div>
+          <div class="d">ฝ่ายบุคคลอัปโหลดไฟล์บันทึกเวลา แล้วระบบคำนวณให้ทั้งรอบ พร้อมหน้าตรวจผลก่อนปิดรอบ</div>
+          <div class="meta"><span class="live">ใช้งานจริงที่บริษัท</span></div>
+        </div>
+
+        <div class="proj">
+          <div class="n">ดึงข้อมูลจากระบบ ERP มาลงตารางอัตโนมัติ</div>
+          <div class="d">แทนการคัดลอกข้อมูลมาวางด้วยมือทุกวัน ซึ่งเสี่ยงวางผิดแถวหรือตกหล่นโดยไม่รู้ตัว</div>
+          <div class="meta"><span class="live">ใช้งานจริงที่บริษัท</span></div>
+        </div>
+
+        <div class="proj">
+          <div class="n">Movie Reviews — เว็บรีวิวภาพยนตร์</div>
+          <div class="d">เว็บแอปมีระบบสมาชิก ผู้ใช้เขียนและจัดการรีวิวของตัวเองได้ ค้นหาและแบ่งหน้าได้</div>
+          <div class="meta"><span>โปรเจกต์รายวิชา</span><a href="https://github.com/Pang67167139/ICT12367_movie_review_project">ดูโค้ดบน GitHub</a></div>
+        </div>
+
+        <div class="proj">
+          <div class="n">เว็บ Portfolio นี้</div>
+          <div class="d">เขียนเองทั้งหมด ไม่ใช้เฟรมเวิร์กและไม่มีขั้นตอน build</div>
+          <div class="meta"><span>พัฒนาร่วมกับ AI</span></div>
+        </div>
+
+      </section>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

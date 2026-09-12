@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>รายละเอียดผลงาน · Tiva</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+  /* หน้านี้ยืมตัวแปรสีและฟอนต์จาก style.css แล้วเพิ่มเลย์เอาต์ของตัวเอง */
+  body{ overflow-x:hidden; }
+  .pj-wrap{ max-width:1080px; margin:0 auto; padding:36px 32px 90px; position:relative; z-index:1; }
+  @media (max-width:640px){ .pj-wrap{ padding:24px 20px 60px; } }
+
+  .crumb{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-bottom:40px; font-size:.9rem; }
+  .crumb{ font-family:var(--mono); }
+  .crumb .back{
+    display:inline-flex; align-items:center; gap:8px; font-weight:700; color:var(--ink);
+    border:1.5px solid var(--line); background:var(--card); border-radius:999px; padding:9px 18px;
+    transition:border-color .2s ease, color .2s ease;
+  }
+  .crumb .back:hover{ border-color:var(--apple); color:var(--apple); }
+  .crumb .path{ color:var(--ink-faint); font-weight:600; }
+  .crumb .path b{ color:var(--ink); font-weight:700; }
+
+  .pj-head{ display:grid; grid-template-columns:1fr 1fr; gap:44px; align-items:start; margin-bottom:52px; }
+  @media (max-width:860px){ .pj-head{ grid-template-columns:1fr; gap:28px; } }
+  .pj-head h1{ font-family:var(--mono); font-weight:500; font-size:clamp(1.7rem,4vw,2.6rem); color:var(--ink); line-height:1.2; letter-spacing:-.03em; }
+  .pj-head .lead{ margin-top:18px; color:var(--ink-soft); font-size:1.02rem; }
+  .pj-badges{ display:flex; gap:8px; flex-wrap:wrap; margin-top:20px; }
+  .pj-badges span{ font-family:var(--mono); font-size:.74rem; padding:5px 13px; border-radius:999px; border:1px solid var(--line); }
+  .pj-badges .live{ color:var(--ink); border-color:var(--ink-faint); }
+  .pj-badges .school{ color:var(--ink-soft); }
+  .pj-badges .wip{ color:var(--ink-soft); }
+  .pj-badges .note{ color:var(--ink-faint); }
+
+  .shot{
+    background:var(--card); border:1.5px solid var(--line); border-radius:var(--radius-lg);
+    padding:12px; box-shadow:none;
+  }
+  .shot img{ width:100%; display:block; border-radius:18px; }
+  .shot .cap{ font-size:.78rem; color:var(--ink-faint); text-align:center; padding:10px 6px 4px; }
+  .shot.empty{ aspect-ratio:16/10; display:flex; align-items:center; justify-content:center; padding:0; overflow:hidden; }
+  .shot.empty .fill{ width:100%; height:100%; display:flex; align-items:center; justify-content:center;
+                     color:rgba(255,255,255,.9); font-weight:700; font-size:1.05rem; text-align:center; padding:24px; }
+
+  .pj-sec{ margin-bottom:38px; }
+  .pj-sec h2{
+    font-family:var(--mono); font-size:.8rem; font-weight:500; letter-spacing:.1em; color:var(--ink-faint);
+    padding-bottom:7px; margin-bottom:16px; border-bottom:1.5px solid var(--line);
+  }
+  .pj-sec p{ color:var(--ink-soft); margin:0 0 12px; font-size:1rem; }
+  .pj-sec ul{ margin:0; padding-left:20px; color:var(--ink-soft); }
+  .pj-sec ul li{ margin-bottom:8px; }
+  .pj-sec ul li b{ color:var(--ink); }
+
+  .chips{ display:flex; gap:9px; flex-wrap:wrap; }
+  .chips span{
+    display:inline-flex; align-items:center; gap:7px; font-family:var(--mono); font-size:.8rem; font-weight:400;
+    background:var(--card); border:1.5px solid var(--line); color:var(--ink);
+    border-radius:12px; padding:9px 16px;
+  }
+
+  .pj-links{ display:flex; gap:12px; flex-wrap:wrap; margin-top:8px; }
+  .pj-nav{ display:flex; justify-content:space-between; gap:14px; flex-wrap:wrap;
+           border-top:1.5px solid var(--line-soft); padding-top:26px; margin-top:46px; }
+  .pj-nav a{ font-family:var(--mono); color:var(--ink-soft); font-size:.85rem; }
+  .pj-nav a:hover{ color:var(--ink); }
+  .missing{ text-align:center; padding:80px 0; color:var(--ink-soft); }
+</style>
+</head>
+<body>
+<div id="speckles" aria-hidden="true"><span class="ring r1"></span><span class="ring r3"></span></div>
+
+<main class="pj-wrap" id="pjRoot">
+  <div class="missing">กำลังโหลด…</div>
+</main>
+
+<script>
+/* ---------------------------------------------------------------
+   เพิ่มโปรเจกต์ใหม่: เติมอีกหนึ่งก้อนใน PROJECTS แล้วชี้ลิงก์จาก
+   การ์ดในหน้าแรกมาที่ project.html?p=<คีย์ที่ตั้งไว้>
+   หัวข้อไหนไม่มีข้อมูล ลบทิ้งได้เลย หน้าจะข้ามให้เอง
+----------------------------------------------------------------- */
+var PROJECTS = {
+
+  'ar-dashboard': {
+    title: 'AR Dashboard — ระบบติดตามลูกหนี้การค้า',
+    lead: 'เว็บแอปบน Google Apps Script รวมข้อมูลลูกหนี้การค้าจากระบบ ERP มาไว้ในหน้าเดียว ' +
+          'คำนวณสถานะ จับคู่เงินเข้า และติดตามยอดค้างชำระผ่านอีเมลและแอปแชทของทีม',
+    badges: [['live','ใช้งานจริงที่บริษัท']],
+    image: 'img/ar-dashboard.png',
+    imageCap: 'ภาพจำลองหน้าจอ · ข้อมูลทั้งหมดเป็นข้อมูลสมมติ',
+    tech: ['Google Apps Script','HtmlService','HTML','CSS','JavaScript','REST API','Google Sheets','Gmail API','Webhook','SheetJS'],
+    sections: [
+      { h:'ที่มา', p:[
+        'เดิมข้อมูลลูกหนี้ไม่อัปเดตตามเวลาจริง ต้องดาวน์โหลดมาวางในชีตเองทุกวัน',
+        'และเวลาจะติดตามลูกค้าต้องเปิดหลายระบบประกอบกัน ทั้งรายการค้างชำระ สถานะเงินเข้า และการแจ้งโอน'
+      ]},
+      { h:'สิ่งที่ทำ', ul:[
+        '<b>ดึงข้อมูล</b> จาก REST API ของระบบ ERP หลาย endpoint ทั้งเอกสารวางบิล เอกสารรับชำระ รายการแจ้งโอน และรายการเดินบัญชี',
+        '<b>ประมวลผล</b> คำนวณจำนวนวันเกินกำหนดและจัดสถานะ คำนวณภาษีหัก ณ ที่จ่าย รองรับทั้งกรณีกรอกเป็นอัตราและเป็นจำนวนเงิน',
+        '<b>จับคู่เงินเข้า</b> เทียบรายการเดินบัญชีกับใบที่ค้าง รองรับกรณีลูกค้าโอนรวมหลายใบเป็นก้อนเดียว',
+        '<b>หน้าจอ</b> การ์ดสรุป ตารางลูกหนี้พร้อมป้ายสถานะ ตัวกรองหลายเงื่อนไข รายงานอายุหนี้ หน้าจัดอันดับลูกค้า และส่งออกเป็น Excel',
+        '<b>ติดตามอัตโนมัติ</b> ส่งอีเมลแจ้งยอดค้าง และแจ้งเตือนเข้าแอปแชทของทีมถึงผู้รับผิดชอบโดยตรง',
+        '<b>งานตามเวลา</b> ใช้ Time-driven Trigger เขียนยอดสรุปลง Google Sheet ตามรอบ ให้นำไปใช้ต่อได้ทันที'
+      ]},
+      { h:'ผลลัพธ์', ul:[
+        'ข้อมูลเป็นปัจจุบันตลอด ไม่ต้องดาวน์โหลดมาวางเองทุกวัน',
+        'เห็นสถานะเงินเข้าและการแจ้งโอนได้จากหน้าเดียว ไม่ต้องเปิดหลายระบบ',
+        'ตรวจสอบความถูกต้องเทียบกับรายงานทางบัญชีแล้วตรงกันทุกรายการ'
+      ]},
+    ]
+  },
+
+  'erp-sheets': {
+    title: 'ดึงข้อมูลจากระบบ ERP เข้า Google Sheets',
+    lead: 'สคริปต์ดึงข้อมูลจากระบบ ERP ผ่าน API มาลง Google Sheets ให้เอง แทนการคัดลอกมาวางด้วยมือทุกครั้ง',
+    badges: [['live','ใช้งานจริงที่บริษัท']],
+    image: 'img/erp-sheets.png',
+    imageCap: 'ภาพจำลองหน้าชีตที่สคริปต์เขียนข้อมูลลงให้ · ข้อมูลทั้งหมดเป็นข้อมูลสมมติ',
+    tech: ['Google Apps Script','REST API','Google Sheets'],
+    sections: [
+      { h:'ที่มา', p:['เดิมต้องคัดลอกข้อมูลจากระบบ ERP มาวางในชีตด้วยมือทุกครั้ง ซึ่งเสี่ยงวางผิดแถวหรือเผลอลบข้อมูลโดยไม่รู้ตัว'] },
+      { h:'สิ่งที่ทำ', ul:[
+        'เรียก API ของระบบ ERP แล้วเขียนผลลงชีตตามรอบที่กำหนด',
+        'จัดรูปแบบข้อมูลให้พร้อมนำไปใช้ต่อ โดยไม่ต้องแก้ด้วยมืออีก'
+      ]},
+    ]
+  },
+
+  'lunch-calc': {
+    title: 'ระบบคำนวณค่าอาหารกลางวัน',
+    lead: 'เว็บแอปบน Google Apps Script ผู้ใช้งานอัปโหลดไฟล์บันทึกเวลา แล้วคำนวณค่าอาหารทั้งรอบให้โดยอัตโนมัติ ',
+    badges: [['live','ใช้งานจริงที่บริษัท'],['wip','กำลังพัฒนาต่อ']],
+    image: 'img/lunch-calc.png',
+    imageCap: 'ภาพจำลองหน้าจอ · ข้อมูลทั้งหมดเป็นข้อมูลสมมติ',
+    tech: ['Google Apps Script','HtmlService','HTML','CSS','JavaScript','Google Sheets'],
+    sections: [
+      { h:'ที่มา', p:['เดิมต้องคัดลอกข้อมูลทีละส่วนมาคำนวณ ซึ่งเสี่ยงวางข้อมูลผิดที่'] },
+      { h:'สิ่งที่ทำ', ul:[
+        'เปลี่ยนขั้นตอนการคัดลอกข้อมูลเป็นอัปโหลดไฟล์บันทึกเวลาเข้าระบบ แล้วคำนวณค่าอาหารทั้งรอบให้โดยอัตโนมัติ',
+        '<b>หน้าเว็บ</b> สร้างด้วย HtmlService เขียน HTML CSS และ JavaScript เอง ให้ผู้ใช้งานผ่านเบราว์เซอร์ได้เลยโดยไม่ต้องเปิดชีตหรือแตะโค้ด',
+        '<b>เหตุผลกำกับ</b> ระบุให้เห็นว่าวันที่ไม่ได้รับสิทธิ์ติดเงื่อนไขข้อไหน ไม่ต้องย้อนไปไล่ดูข้อมูลดิบเอง',
+        '<b>รายการที่ควรตรวจสอบ</b> คัดแถวที่ข้อมูลผิดปกติออกมาให้ตรวจก่อนปิดรอบ และส่งออกเป็นไฟล์ Excel ได้'
+      ]},
+      { h:'แผนพัฒนา', p:['ต่อ API ของระบบ ERP เข้ามาโดยตรง เพื่อตัดขั้นตอนอัปโหลดไฟล์ออกอีกชั้น'] }
+    ]
+  },
+
+  'movie-reviews': {
+    title: 'Movie Reviews — เว็บรีวิวภาพยนตร์',
+    lead: 'เว็บแอป Django ที่ผู้ใช้สมัครสมาชิกและเขียนรีวิวภาพยนตร์ได้ พร้อมระบบจัดการสิทธิ์ผู้ใช้',
+    badges: [['school','โปรเจกต์รายวิชา · 2025']],
+    image: 'img/movie-review.jpg',
+    imageCap: 'หน้าแรกของเว็บ',
+    tech: ['Python','Django','SQLite','Bootstrap'],
+    links: [['ดูโค้ดบน GitHub','https://github.com/Pang67167139/ICT12367_movie_review_project']],
+    sections: [
+      { h:'สิ่งที่ทำ', ul:[
+        '<b>ระบบสมาชิก</b> สมัครและเข้าสู่ระบบเพื่อเขียนรีวิว แก้ไขหรือลบได้เฉพาะรีวิวของตัวเอง',
+        '<b>จัดการสิทธิ์</b> การเพิ่ม แก้ไข และลบข้อมูลภาพยนตร์จำกัดไว้ให้ผู้ดูแลระบบเท่านั้น โดยใช้ระบบสิทธิ์และกลุ่มผู้ใช้ของ Django',
+        '<b>ค้นหา</b> กรองได้พร้อมกัน 4 เงื่อนไข คือชื่อเรื่อง ผู้กำกับ ประเภท และปีที่ฉาย',
+        '<b>อื่น ๆ</b> แบ่งหน้ารายการ อัปโหลดโปสเตอร์ และแจ้งผลการทำงานให้ผู้ใช้ทุกครั้งที่บันทึกข้อมูล'
+      ]},
+      { h:'หมายเหตุ', p:['ทำในรายวิชาระหว่างเรียนปริญญาตรี โค้ดทั้งหมดอยู่บน GitHub ดูประวัติการแก้ไขย้อนหลังได้'] }
+    ]
+  }
+
+};
+
+(function(){
+  var key = new URLSearchParams(location.search).get('p');
+  var d = PROJECTS[key];
+  var root = document.getElementById('pjRoot');
+
+  if (!d){
+    root.innerHTML = '<div class="missing"><h1 style="font-size:1.6rem;margin-bottom:14px;">ไม่พบผลงานที่ต้องการ</h1>' +
+      '<p style="margin-bottom:22px;">ลิงก์อาจไม่ถูกต้อง</p>' +
+      '<a class="btn btn-primary" href="index.html#portfolio">กลับไปหน้าผลงาน</a></div>';
+    return;
+  }
+  document.title = d.title + ' · ทิวารัตน์ อัมฤทธิ์';
+
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+
+  var html = '<div class="crumb">' +
+    '<a class="back" href="index.html#portfolio"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5m6-6-6 6 6 6"/></svg>กลับ</a>' +
+    '<span class="path">ผลงาน › <b>' + esc(d.title) + '</b></span></div>';
+
+  html += '<div class="pj-head"><div>' +
+    '<h1>' + esc(d.title) + '</h1>' +
+    '<p class="lead">' + esc(d.lead) + '</p>';
+  if (d.badges && d.badges.length){
+    html += '<div class="pj-badges">';
+    d.badges.forEach(function(b){ html += '<span class="' + b[0] + '">' + esc(b[1]) + '</span>'; });
+    html += '</div>';
+  }
+  html += '</div><div>';
+  if (d.image){
+    html += '<div class="shot"><img src="' + d.image + '" alt="' + esc(d.title) + '">' +
+            (d.imageCap ? '<div class="cap">' + esc(d.imageCap) + '</div>' : '') + '</div>';
+  } else {
+    html += '<div class="shot empty"><div class="fill" style="background:' + (d.swatch || 'var(--tote)') + '">' +
+            esc(d.title) + '</div></div>';
+  }
+  html += '</div></div>';
+
+  if (d.tech && d.tech.length){
+    html += '<div class="pj-sec"><h2>เทคโนโลยีที่ใช้</h2><div class="chips">';
+    d.tech.forEach(function(t){ html += '<span>' + esc(t) + '</span>'; });
+    html += '</div></div>';
+  }
+
+  (d.sections || []).forEach(function(sec){
+    html += '<div class="pj-sec"><h2>' + esc(sec.h) + '</h2>';
+    (sec.p || []).forEach(function(t){ html += '<p>' + t + '</p>'; });
+    if (sec.ul){ html += '<ul>'; sec.ul.forEach(function(t){ html += '<li>' + t + '</li>'; }); html += '</ul>'; }
+    html += '</div>';
+  });
+
+  if (d.links && d.links.length){
+    html += '<div class="pj-links">';
+    d.links.forEach(function(l){
+      html += '<a class="btn btn-outline" href="' + l[1] + '" target="_blank" rel="noopener">' + esc(l[0]) +
+        '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h9v9M18 6 6 18"/></svg></a>';
+    });
+    html += '</div>';
+  }
+
+  // ลิงก์ไปโปรเจกต์ก่อนหน้า/ถัดไป ตามลำดับใน PROJECTS
+  var keys = Object.keys(PROJECTS), i = keys.indexOf(key);
+  var prev = keys[i-1], next = keys[i+1];
+  html += '<div class="pj-nav">' +
+    (prev ? '<a href="project.html?p=' + prev + '">← ' + esc(PROJECTS[prev].title) + '</a>' : '<span></span>') +
+    (next ? '<a href="project.html?p=' + next + '">' + esc(PROJECTS[next].title) + ' →</a>' : '<span></span>') +
+    '</div>';
+
+  root.innerHTML = html;
+})();
+</script>
+</body>
+</html>
