@@ -26,17 +26,43 @@
   function setActive(id){
     links.forEach(function(l){ l.classList.toggle('active', l.getAttribute('data-sec') === id); });
   }
-  var sections = ['home','about','work','portfolio','contact'].map(function(id){ return document.getElementById(id); });
-  if ('IntersectionObserver' in window){
-    var io = new IntersectionObserver(function(entries){
-      var best = null, bestRatio = 0;
-      entries.forEach(function(e){
-        if (e.isIntersecting && e.intersectionRatio > bestRatio){ bestRatio = e.intersectionRatio; best = e.target; }
-      });
-      if (best) setActive(best.id);
-    }, { threshold: [0.2,0.5,0.75] });
-    sections.forEach(function(s){ if (s) io.observe(s); });
+  var sections = ['home','about','work','portfolio','contact']
+    .map(function(id){ return document.getElementById(id); })
+    .filter(Boolean);
+
+  /* เดิมใช้ IntersectionObserver แล้วเทียบว่า section ไหน intersectionRatio สูงสุด
+     ซึ่งผิด เพราะค่านั้นคิดเป็นสัดส่วนของความสูงตัวเอง ไม่ใช่ของจอ
+     home สูง 666px จึงขึ้นถึง 1.00 ได้ ส่วน about สูง 1014px ทำได้สูงสุด 0.89
+     home เลยชนะตลอดแม้โผล่แค่นิดเดียว เมนูจึงค้างที่ Home ทั้งที่เลื่อนมา About แล้ว
+
+     เปลี่ยนมาวัดจากตำแหน่งการเลื่อนแทน: ลากเส้นอ้างอิงไว้ใต้แถบเมนู
+     section ที่ active คืออันสุดท้ายที่ขอบบนเลยเส้นนี้ไปแล้ว
+     วิธีนี้ไม่สนใจว่า section สูงเท่าไร ผลจึงตรงกับที่ตาเห็นเสมอ */
+  var navStage = document.querySelector('.nav-stage');
+
+  function updateSpy(){
+    if (!sections.length) return;
+    var line = (navStage ? navStage.getBoundingClientRect().height : 0) + 40;
+    var current = sections[0];
+    sections.forEach(function(s){
+      if (s.getBoundingClientRect().top <= line) current = s;
+    });
+    // เลื่อนสุดหน้าแล้วให้เป็นหัวข้อสุดท้ายเสมอ ไม่งั้น section ท้าย ๆ ที่สั้น
+    // จะไม่มีทางดันขอบบนขึ้นมาถึงเส้น แล้วจะไม่เคยถูกไฮไลต์เลย
+    if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2){
+      current = sections[sections.length - 1];
+    }
+    setActive(current.id);
   }
+
+  /* เรียกตรง ๆ ไม่หน่วงด้วย requestAnimationFrame
+     เพราะถ้า rAF ไม่ถูกเรียกด้วยเหตุใดก็ตาม ธงกันซ้ำจะค้างเป็น true
+     แล้ว scroll ครั้งถัด ๆ ไปจะถูกกลืนหมด เมนูค้างตลอดกาล
+     งานในนี้คืออ่านตำแหน่ง 5 ก้อน เบาพอที่จะทำทุกครั้งได้ */
+  window.addEventListener('scroll', updateSpy, { passive: true });
+  window.addEventListener('resize', updateSpy);
+  updateSpy();
+
   links.forEach(function(l){ l.addEventListener('click', function(){ setActive(l.getAttribute('data-sec')); }); });
 
   /* -------- ชื่อใหญ่เลื่อนขึ้นจากใต้เส้น -------- */
